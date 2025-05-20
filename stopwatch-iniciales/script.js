@@ -2,10 +2,12 @@ let startTime = 0;
 let elapsedTime = 0;
 let timerInterval;
 let isRunning = false;
+let lapCount = 0;
 
 const timerDisplay = document.getElementById('timer');
 const startPauseBtn = document.getElementById('startPauseBtn');
 const resetBtn = document.getElementById('resetBtn');
+const lapList = document.getElementById('lapList');
 
 function formatTime(ms) {
   const date = new Date(ms);
@@ -31,11 +33,15 @@ function startTimer() {
 }
 
 function pauseTimer() {
+  const now = Date.now();
+  const currentElapsed = now - startTime + elapsedTime;
   clearInterval(timerInterval);
-  elapsedTime += Date.now() - startTime;
+  elapsedTime = currentElapsed;
   isRunning = false;
+  timerDisplay.textContent = formatTime(currentElapsed); // sincroniza visualmente
   startPauseBtn.textContent = 'Continuar';
   startPauseBtn.setAttribute('aria-label', 'Continuar cronómetro');
+  addLapTime(currentElapsed); // mismo valor que en pantalla
 }
 
 function resetTimer() {
@@ -43,9 +49,18 @@ function resetTimer() {
   startTime = 0;
   elapsedTime = 0;
   isRunning = false;
+  lapCount = 0;
   timerDisplay.textContent = '00:00:00.000';
   startPauseBtn.textContent = 'Iniciar';
   startPauseBtn.setAttribute('aria-label', 'Iniciar cronómetro');
+  lapList.innerHTML = '';
+}
+
+function addLapTime(time) {
+  lapCount++;
+  const li = document.createElement('li');
+  li.textContent = `${lapCount}. ${formatTime(time)}`;
+  lapList.appendChild(li);
 }
 
 startPauseBtn.addEventListener('click', () => {
@@ -59,4 +74,3 @@ startPauseBtn.addEventListener('click', () => {
 });
 
 resetBtn.addEventListener('click', resetTimer);
-
